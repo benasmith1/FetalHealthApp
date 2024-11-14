@@ -39,15 +39,22 @@ fetalhealth_train = pd.read_csv("fetal_health.csv")
 # Create a sidebar for input collection
 st.sidebar.header('Fetal Health Features Input')
 
+# User file input
 file_input = st.sidebar.file_uploader("Upload your data")
 
+# Example dataframe
+st.sidebar.warning('Ensure your data strictly follows the format outlined below:', icon="⚠️")
+example_upload = pd.read_csv("fetal_health_user.csv")
+st.sidebar.write(example_upload.head())
+
+# Select type of model
 model_type = st.sidebar.radio(
   "Choose model for prediction",
   options=["Random Forest", "Decision Tree", "AdaBoost", "Soft Voting"]
   )
 
 
-#function to change column "Predicted Fetal Health" class numbers to the predicted class
+# Function to change column "Predicted Fetal Health" class numbers to the predicted class
 def change_fetalhealth_values(preds):
   i = 0 
   while i < len(preds):
@@ -65,85 +72,110 @@ def get_indices(arr, string):
   arr = np.array(arr)
   indices = np.where(arr == string)
   indices = np.asarray(indices)[0]
-  print(indices)
-  return(indices) #[0,1,2,3,4])
-
-  return indices
-
-
-    
+  return(indices) 
 
 
 #sidebar file input
 if file_input:
-    
+  
+  st.sidebar.info(f"You selected: {model_type}")
+
   fetalhealth_test = pd.read_csv(file_input)
   
   if model_type == "Random Forest":
-    #get predictions and prediction probabilities
+    #get predictions and prediction probabilities from rf
     preds = clf_rf.predict(fetalhealth_test)
     probas = clf_rf.predict_proba(fetalhealth_test)
     probas = np.max(probas, axis=1)
-    print(probas)
 
+  if model_type == "Decision Tree":
+    #get predictions and prediction probabilities from dt
+    preds = clf_dt.predict(fetalhealth_test)
+    probas = clf_dt.predict_proba(fetalhealth_test)
+    probas = np.max(probas, axis=1)
 
-    preds = pd.Series(preds)
-    preds = change_fetalhealth_values(preds)
+  if model_type == "AdaBoost":
+    #get predictions and prediction probabilities from ada
+    preds = clf_ada.predict(fetalhealth_test)
+    probas = clf_ada.predict_proba(fetalhealth_test)
+    probas = np.max(probas, axis=1)
 
+  if model_type == "Soft Voting":
+    #get predictions and prediction probabilities from voting
+    preds = clf_vote.predict(fetalhealth_test)
+    probas = clf_vote.predict_proba(fetalhealth_test)
+    probas = np.max(probas, axis=1)
 
-    probas = pd.Series(probas)
+  # change structure of predictions and probabilities
+  preds = pd.Series(preds)
+  preds = change_fetalhealth_values(preds)
+  probas = pd.Series(probas)
 
-    fetalhealth_test["Predicted Fetal Health"] = preds
-    fetalhealth_test["Predicted Probability"] = probas
+  # add predictions and probabilities to df
+  fetalhealth_test["Predicted Fetal Health"] = preds
+  fetalhealth_test["Predicted Probability"] = probas
 
-    fetalhealth_test = fetalhealth_test.style.set_properties(**{'background-color': 'lime', 'color': 'white'}, subset=pd.IndexSlice[get_indices(preds, "Normal"), "Predicted Fetal Health"])\
-      .set_properties(**{'background-color': 'yellow', 'color': 'black'},subset=pd.IndexSlice[get_indices(preds, "Suspect"), "Predicted Fetal Health"])\
-      .set_properties(**{'background-color': 'red', 'color': 'white'},subset=pd.IndexSlice[get_indices(preds, "Pathological"), "Predicted Fetal Health"])
+  # add color to the df based on predicted fetal health
+  fetalhealth_test = fetalhealth_test.style.set_properties(**{'background-color': 'lime', 'color': 'white'}, subset=pd.IndexSlice[get_indices(preds, "Normal"), "Predicted Fetal Health"])\
+    .set_properties(**{'background-color': 'yellow', 'color': 'black'},subset=pd.IndexSlice[get_indices(preds, "Suspect"), "Predicted Fetal Health"])\
+    .set_properties(**{'background-color': 'orange', 'color': 'white'},subset=pd.IndexSlice[get_indices(preds, "Pathological"), "Predicted Fetal Health"])
 
+  st.write(fetalhealth_test)
 
-
-    #fetalhealth_test = fetalhealth_test.style.set_properties({"Predicted Fetal Health": "green",})
-    #fetalhealth_test=fetalhealth_test.style.set_properties(**{'background-color': 'pink', 'color': 'purple'})
-
-    #fetalhealth_test['Predicted Probability'].style.bar()
-
-
-    st.write(fetalhealth_test)
-
-
-
-#   # Showing Feature Importance plot
-# st.write('We used a machine learning model (Decision Tree) to predict the species. '
-#         'The features used in this prediction are ranked by relative importance below.')
-# st.image('feature_imp.svg')
+  # Showing Feature Importance plot
+st.write(f'We used a machine learning model ({model_type}) to predict the species. '
+         'Some illustrations of model performance on validation data are displayed below')
 
 # #----------------------------------------------------------
-# # Showing additional items in tabs
-# st.subheader("Prediction Performance")
-# tab1, tab2, tab3, tab4 = st.tabs(["Decision Tree", "Feature Importance", "Confusion Matrix", "Classification Report"])
 
-# # Tab 1: Visualizing Decision Tree
-# with tab1:
-#     st.write("### Decision Tree Visualization")
-#     st.image('dt_visual.svg')
-#     st.caption("Visualization of the Decision Tree used in prediction.")
+if file_input:
+  st.subheader("Prediction Performance on Validation Dataset")
 
-# # Tab 2: Feature Importance Visualization
-# with tab2:
-#     st.write("### Feature Importance")
-#     st.image('feature_imp.svg')
-#     st.caption("Features used in this prediction are ranked by relative importance.")
+  if model_type == "Decision Tree":
+    featimp_img = "figures/feature_imp_dt.svg"
+    conf_matrix_img = "figures/confusion_mat_dt.svg"
+    class_report_img = "figures/class_report_dt.csv"
+  if model_type == "Random Forest":
+    featimp_img = "figures/feature_imp_rf.svg"
+    conf_matrix_img = "figures/confusion_mat_rf.svg"
+    class_report_img = "figures/class_report_rf.csv"
+  if model_type == "AdaBoost":
+    featimp_img = "figures/feature_imp_ada.svg"
+    conf_matrix_img = "figures/confusion_mat_ada.svg"
+    class_report_img = "figures/class_report_ada.csv"
+  if model_type == "Soft Voting":
+    featimp_img = "figures/feature_imp_vote.svg"
+    conf_matrix_img = "figures/confusion_mat_vote.svg"
+    class_report_img = "figures/class_report_vote.csv"
 
-# # Tab 3: Confusion Matrix
-# with tab3:
-#     st.write("### Confusion Matrix")
-#     st.image('confusion_mat.svg')
-#     st.caption("Confusion Matrix of model predictions.")
+  # if model_type == "Decision Tree": # decsion tree is too big and not really informative so I won't include it on the site
+  # # Showing additional items in tabs
+  #   tab1, tab2, tab3, tab4 = st.tabs(["Feature Importance", "Confusion Matrix", "Classification Report", "Decision Tree"])
+  #else: 
+  tab1, tab2, tab3 = st.tabs(["Feature Importance", "Confusion Matrix", "Classification Report"])
 
-# # Tab 4: Classification Report
-# with tab4:
-#     st.write("### Classification Report")
-#     report_df = pd.read_csv('class_report.csv', index_col = 0).transpose()
-#     st.dataframe(report_df.style.background_gradient(cmap='RdBu').format(precision=2))
-#     st.caption("Classification Report: Precision, Recall, F1-Score, and Support for each species.")
+  # Tab 1: Feature Importance Visualization
+  with tab1:
+      st.write("### Feature Importance")
+      st.image(featimp_img)
+      st.caption("Features used in this prediction are ranked by relative importance.")
 
+  # Tab 2: Confusion Matrix
+  with tab2:
+      st.write("### Confusion Matrix")
+      st.image(conf_matrix_img)
+      st.caption("Confusion Matrix of model predictions.")
+
+  # Tab 3: Classification Report
+  with tab3:
+      st.write("### Classification Report")
+      report_df = pd.read_csv(class_report_img, index_col = 0).transpose()
+      st.dataframe(report_df.style.background_gradient(cmap='RdBu').format(precision=2))
+      st.caption("Classification Report: Precision, Recall, F1-Score, and Support for each species.")
+
+  # if model_type == "Decision Tree":
+  #   # Tab 4: Visualizing Decision Tree
+  #   with tab4:
+  #       st.write("### Decision Tree Visualization")
+  #       st.image('dt_visual.svg')
+  #       st.caption("Visualization of the Decision Tree used in prediction.")
