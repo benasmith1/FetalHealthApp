@@ -126,7 +126,7 @@ if file_input:
 # #----------------------------------------------------------
 
 if file_input:
-  st.write(f'We used a machine learning model ({model_type}) to predict the species. '
+  st.write(f'We used a machine learning model ({model_type}) to predict fetal health. '
          'Illustrations of model performance on validation data are displayed below')
 
   st.subheader("Prediction Performance on Validation Dataset")
