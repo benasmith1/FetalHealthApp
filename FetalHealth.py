@@ -122,13 +122,13 @@ if file_input:
 
   st.write(fetalhealth_test)
 
-  # Showing Feature Importance plot
-st.write(f'We used a machine learning model ({model_type}) to predict the species. '
-         'Some illustrations of model performance on validation data are displayed below')
 
 # #----------------------------------------------------------
 
 if file_input:
+  st.write(f'We used a machine learning model ({model_type}) to predict the species. '
+         'Illustrations of model performance on validation data are displayed below')
+
   st.subheader("Prediction Performance on Validation Dataset")
 
   if model_type == "Decision Tree":
