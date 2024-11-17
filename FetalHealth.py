@@ -70,7 +70,7 @@ def change_fetalhealth_values(preds):
 # Function to get indices of column "Predicted Fetal Health" 
 def get_indices(arr, string):
   arr = np.array(arr)
-  indices = np.where(arr == string)
+  indices = np.where(arr == string) #https://www.geeksforgeeks.org/numpy-where-in-python/ 
   indices = np.asarray(indices)[0]
   return(indices) 
 
@@ -88,25 +88,25 @@ if file_input:
     #get predictions and prediction probabilities from rf
     preds = clf_rf.predict(fetalhealth_test)
     probas = clf_rf.predict_proba(fetalhealth_test)
-    probas = np.max(probas, axis=1)
+    probas = np.max(probas, axis=1) # google gemini ai was used to write this line of code: see appendix
 
   if model_type == "Decision Tree":
     #get predictions and prediction probabilities from dt
     preds = clf_dt.predict(fetalhealth_test)
     probas = clf_dt.predict_proba(fetalhealth_test)
-    probas = np.max(probas, axis=1)
+    probas = np.max(probas, axis=1) # google gemini ai was used to write this line of code: see appendix
 
   if model_type == "AdaBoost":
     #get predictions and prediction probabilities from ada
     preds = clf_ada.predict(fetalhealth_test)
     probas = clf_ada.predict_proba(fetalhealth_test)
-    probas = np.max(probas, axis=1)
+    probas = np.max(probas, axis=1) # google gemini ai was used to write this line of code: see appendix
 
   if model_type == "Soft Voting":
     #get predictions and prediction probabilities from voting
     preds = clf_vote.predict(fetalhealth_test)
     probas = clf_vote.predict_proba(fetalhealth_test)
-    probas = np.max(probas, axis=1)
+    probas = np.max(probas, axis=1) # google gemini ai was used to write this line of code: see appendix
 
   # change structure of predictions and probabilities
   preds = pd.Series(preds)
@@ -118,6 +118,7 @@ if file_input:
   fetalhealth_test["Predicted Probability"] = probas
 
   # add color to the df based on predicted fetal health
+  # https://medium.com/@romina.elena.mendez/transform-your-pandas-dataframes-styles-colors-and-emojis-bf938d6e98a2 
   fetalhealth_test = fetalhealth_test.style.set_properties(**{'background-color': 'lime', 'color': 'white'}, subset=pd.IndexSlice[get_indices(preds, "Normal"), "Predicted Fetal Health"])\
     .set_properties(**{'background-color': 'yellow', 'color': 'black'},subset=pd.IndexSlice[get_indices(preds, "Suspect"), "Predicted Fetal Health"])\
     .set_properties(**{'background-color': 'orange', 'color': 'white'},subset=pd.IndexSlice[get_indices(preds, "Pathological"), "Predicted Fetal Health"])
