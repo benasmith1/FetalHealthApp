@@ -75,12 +75,12 @@ def get_indices(arr, string):
   return(indices) 
 
 if not file_input:
-  st.info("⏏️ Please upload data to proceed")
+  st.info("⏏  Please upload data in sidebar to proceed")
 
 #sidebar file input
 if file_input:
   st.success("✅ CSV file uploaded successfully")
-  st.sidebar.info(f"You selected: {model_type}")
+  st.sidebar.info(f"You selected: {model_type}" , icon="check_circle")
 
   fetalhealth_test = pd.read_csv(file_input)
   
