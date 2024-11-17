@@ -80,7 +80,7 @@ if not file_input:
 #sidebar file input
 if file_input:
   st.success("✅ CSV file uploaded successfully")
-  st.sidebar.info(f"You selected: {model_type}" , icon="check_circle")
+  st.sidebar.info(f"You selected: {model_type}")
 
   fetalhealth_test = pd.read_csv(file_input)
   
