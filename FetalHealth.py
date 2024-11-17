@@ -120,7 +120,7 @@ if file_input:
     .set_properties(**{'background-color': 'yellow', 'color': 'black'},subset=pd.IndexSlice[get_indices(preds, "Suspect"), "Predicted Fetal Health"])\
     .set_properties(**{'background-color': 'orange', 'color': 'white'},subset=pd.IndexSlice[get_indices(preds, "Pathological"), "Predicted Fetal Health"])
 
-  st.write("Scroll to the right of your dataframe to view predicted fetal health and predicted probabilities")
+  st.write("Scroll to the right of your dataframe below to view predicted fetal health and predicted probabilities")
   st.write(fetalhealth_test)
 
 
